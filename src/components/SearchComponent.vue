@@ -105,6 +105,16 @@
   outline: 1px solid white;
 }
 
+@media only screen and (max-width: 600px) {
+  .date-time-container {
+    margin: 0 auto;
+  }
+
+  .search-form {
+    margin: 0 auto;
+}
+}
+
 @media only screen and (max-width: 400px) {
   .search-form > .input-wraper > input {
     width: 180px;
