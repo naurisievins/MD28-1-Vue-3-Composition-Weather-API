@@ -1,8 +1,11 @@
 <script lang="ts">
   import { useWeatherStore } from '@/stores/weatherStore';
   import { onBeforeMount } from 'vue';
+  import LoadingComponent from './LoadingComponent.vue';
+  import ErrorComponent from './ErrorComponent.vue'
 
   export default {
+  components: { LoadingComponent, ErrorComponent },
     setup() {
       const weatherStore = useWeatherStore();
 
@@ -35,14 +38,15 @@
         return sunriseLocalDate;
       }
 
-      return { weatherStore, convertMstoTime, getMonthNameAndDate }
+      return { weatherStore, convertMstoTime, getMonthNameAndDate, LoadingComponent, ErrorComponent }
     }
   }
 </script>
 
 <template>
-  <div v-if="weatherStore.loading">Loading...</div>
-  <div v-else-if="weatherStore.error">Error...</div>
+
+  <LoadingComponent v-if="weatherStore.loading"/>
+  <ErrorComponent v-else-if="weatherStore.error" />
   <div v-else class="weather-container">
     <div class="weather-today" v-if="weatherStore.weather.data">
       <span class="location">
@@ -63,29 +67,47 @@
       </div>
 
 
-      <div class="row">
+      <div class="row row--box">
 
         <div class="box">
           <span>
-            <span>Wind speed:</span>
+            <span class="box-description">Wind speed:</span>
             {{ weatherStore.oneDayWeather.wind_spd }} m/s
           </span>
 
           <span>
-            <span>Wind direction: </span>
+            <span class="box-description">Wind direction: </span>
             {{ weatherStore.oneDayWeather.wind_cdir_full }}
           </span>
         </div>
 
         <div class="box">
-          <span>Average relative humidity: {{ weatherStore.oneDayWeather.rh }} %</span>
-          <span> Average pressure: {{ weatherStore.oneDayWeather.pres }} mb</span>
-          <span>  Average total cloud coverage: {{ weatherStore.oneDayWeather.clouds }} %</span>
+          <span>
+            <span class="box-description">Average relative humidity:</span>
+            {{ weatherStore.oneDayWeather.rh }} %
+          </span>
+
+          <span>
+            <span class="box-description">Average pressure:</span>
+            {{ weatherStore.oneDayWeather.pres }} mb
+          </span>
+
+          <span>
+            <span class="box-description">Average total cloud coverage:</span>
+            {{ weatherStore.oneDayWeather.clouds }} %
+          </span>
         </div>
 
         <div class="box">
-          <span>Sunrise: {{ convertMstoTime(weatherStore.oneDayWeather.sunrise_ts) }}</span>
-          <span>Sunset: {{ convertMstoTime(weatherStore.oneDayWeather.sunset_ts) }}</span>
+          <span>
+            <span class="box-description">Sunrise:</span>
+            {{ convertMstoTime(weatherStore.oneDayWeather.sunrise_ts) }}
+          </span>
+
+          <span>
+            <span class="box-description">Sunset:</span>
+            {{ convertMstoTime(weatherStore.oneDayWeather.sunset_ts) }}
+          </span>
         </div>
 
       </div>
@@ -94,7 +116,7 @@
     <div class="weather-next" v-if="weatherStore.weather.data">
       <div
         class="weather-next-each-day"
-        v-for="(day, index) in weatherStore.weather.data.slice(1,15)"
+        v-for="(day, index) in weatherStore.weather.data.slice(0,14)"
         :key="index"
         @click="() => weatherStore.setOneDayWeather(day.datetime)"
       >
@@ -108,6 +130,10 @@
 </template>
 
 <style scoped>
+
+.box-description {
+  color: grey;
+}
 .weather-today {
   display: flex;
   flex-direction: column;
@@ -167,6 +193,7 @@
   border: 1px solid rgb(192, 190, 190);
   box-shadow: rgba(0, 0, 0, 0.19) 0px 10px 20px, rgba(0, 0, 0, 0.23) 0px 6px 6px;
   cursor: pointer;
+  user-select: none;
 }
 
 .weather-next-each-day:hover {
@@ -192,6 +219,20 @@
   position: absolute;
   opacity: 0.3;
   margin: 0 auto;
+}
+
+@media only screen and (max-width: 1000px) {
+  .row--box {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .box {
+    width: 100%;
+    border-top: 2px solid rgb(151, 150, 150);;
+  }
 }
 
 </style>

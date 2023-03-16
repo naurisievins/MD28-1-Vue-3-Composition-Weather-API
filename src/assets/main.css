@@ -1,9 +1,14 @@
 @import './reset.scss';
 @import url('https://fonts.googleapis.com/css2?family=Raleway:wght@400;600&display=swap');
 
+:root {
+  font-size: 16px;
+  line-height: 1.5;
+}
+
 body {
   font-family: 'Raleway', sans-serif;
-  background: linear-gradient(#4e6c14, #ffffff);
+  background: linear-gradient(#42a4ed, #ffffff);
 }
 
 #app {
@@ -16,3 +21,9 @@ body {
   font-weight: normal;
 }
 
+
+@media only screen and (max-width: 440px) {
+  #app {
+    padding: 5px;
+  }
+}

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { useWeatherStore } from '@/stores/weatherStore';
-  import { ref } from 'vue';
+  import { onMounted, ref } from 'vue';
 
 
   export default {
@@ -9,6 +9,7 @@
 
       const weatherStore = useWeatherStore();
       const searchFor = ref('')
+      const currentDateTime = ref(new Date().toLocaleString());
 
       const handleSubmit = () => {
         if (searchFor.value) {
@@ -23,32 +24,62 @@
         weatherStore.getWeather();
       }
 
-      return { handleSubmit, searchFor, handleHomeButton }
+    onMounted(() => {
+      setInterval(() => {
+        currentDateTime.value = new Date().toLocaleString();
+      }, 1000);
+    })
+
+      return { handleSubmit, searchFor, handleHomeButton, currentDateTime }
     }
   }
 </script>
 
 <template>
   <div class="top-nav">
-    <div @click="handleHomeButton()">Home</div>
+    <div @click="handleHomeButton()">
+      <img
+        src="https://cdn-icons-png.flaticon.com/512/9073/9073243.png" :width="30"
+        class="home-icon"
+      />
+    </div>
     <form @submit.prevent="handleSubmit" class="search-form">
       <div class="input-wraper">
-        <input type="text" placeholder="City name..." v-model="searchFor" autofocus />
+        <input type="text" placeholder="City..." v-model="searchFor" autofocus />
         <img class="input-icon" src="https://img.icons8.com/material-two-tone/256/search.png">
       </div>
-      <button>
+      <button class="search-button">
         <span class="search-button-content">
           Search
         </span>
       </button>
     </form>
+    <div class="date-time">
+      {{ currentDateTime }}
+    </div>
   </div>
 </template>
 
 <style scoped>
 
+.date-time {
+  margin-left: auto;
+}
+
 .input-wraper {
   position: relative;
+}
+
+.search-button {
+  border-radius: 7px;
+  cursor: pointer;
+  border: 1px solid rgb(255, 255, 255);
+  padding: 0 5px;
+  font-size: 0.9rem;
+}
+
+.home-icon {
+  cursor: pointer;
 }
 
 .input-icon {
@@ -60,6 +91,8 @@
 
 .top-nav {
   display: flex;
+  flex-wrap: wrap;
+  align-items: center;
   gap: 10px;
   padding: 5px 10px;
   background-color: rgb(42 38 38);
@@ -92,5 +125,11 @@
 
 .search-button-img {
   width: 25px;
+}
+
+@media only screen and (max-width: 400px) {
+  .search-form > .input-wraper > input {
+    width: 180px;
+  }
 }
 </style>
