@@ -2,14 +2,11 @@
   import { useWeatherStore } from '@/stores/weatherStore';
   import { onMounted, ref } from 'vue';
 
-
   export default {
-    
     setup() {
-
       const weatherStore = useWeatherStore();
       const searchFor = ref('')
-      const currentDateTime = ref(new Date().toLocaleString());
+      const currentDateTime = ref(new Date().toLocaleString('eu', { hour12: false }));
 
       const handleSubmit = () => {
         if (searchFor.value) {
@@ -26,7 +23,7 @@
 
     onMounted(() => {
       setInterval(() => {
-        currentDateTime.value = new Date().toLocaleString();
+        currentDateTime.value = new Date().toLocaleString('eu', { hour12: false });
       }, 1000);
     })
 
@@ -48,34 +45,24 @@
         <input type="text" placeholder="City..." v-model="searchFor" autofocus />
         <img class="input-icon" src="https://img.icons8.com/material-two-tone/256/search.png">
       </div>
-      <button class="search-button">
-        <span class="search-button-content">
-          Search
-        </span>
-      </button>
+      <button>Search</button>
     </form>
-    <div class="date-time">
-      {{ currentDateTime }}
+    <div class="date-time-container">
+      <span class="date-time">
+        {{ currentDateTime }}
+      </span>
     </div>
   </div>
 </template>
 
 <style scoped>
-
-.date-time {
+.date-time-container {
   margin-left: auto;
+  width: 150px;
 }
 
 .input-wraper {
   position: relative;
-}
-
-.search-button {
-  border-radius: 7px;
-  cursor: pointer;
-  border: 1px solid rgb(255, 255, 255);
-  padding: 0 5px;
-  font-size: 0.9rem;
 }
 
 .home-icon {
@@ -116,15 +103,6 @@
 
 .search-form > .input-wraper > input:focus {
   outline: 1px solid white;
-}
-
-.search-button-content {
-  display: flex;
-  gap: 5px;
-}
-
-.search-button-img {
-  width: 25px;
 }
 
 @media only screen and (max-width: 400px) {

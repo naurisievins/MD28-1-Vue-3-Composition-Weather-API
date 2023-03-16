@@ -57,14 +57,9 @@ export const useWeatherStore = defineStore('weather', {
     oneDayWeather: {} as WeatherData,
     searchFor: 'Riga',
     loading: false,
-    error: false
+    error: false,
+    tempInCelsius: true
   }),
-
-  getters: {
-    // movies(): Movie[] | undefined {
-    //   return this.response.Search
-    // },
-  },
 
   actions: {
     getWeather() {
@@ -93,6 +88,10 @@ export const useWeatherStore = defineStore('weather', {
       }
     },
 
+    toggleTempInCelsius() {
+      this.tempInCelsius = !this.tempInCelsius
+    },
+
     setOneDayWeather(datetime: string) {
       const filteredWeatherData = this.weather.data.filter((day) => day.datetime === datetime)
 
@@ -100,21 +99,5 @@ export const useWeatherStore = defineStore('weather', {
         this.oneDayWeather = filteredWeatherData[0]
       }
     }
-
-    // findMovieById(id: string) {
-    //   this.loading = true
-
-    //   axios
-    //     .get<MovieById>(`https://www.omdbapi.com/?i=${id}&apikey=42944933`)
-    //     .then(({ data }) => {
-    //       this.movieById = data
-
-    //       this.loading = true
-    //     })
-    //     .catch(() => {
-    //       this.loading = false
-    //       this.error = true
-    //     })
-    // },
   }
 })

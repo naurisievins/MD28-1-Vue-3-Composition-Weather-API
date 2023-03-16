@@ -3,6 +3,8 @@
   import { onBeforeMount } from 'vue';
   import LoadingComponent from './LoadingComponent.vue';
   import ErrorComponent from './ErrorComponent.vue'
+  import getMonthNameAndDate from '../utility/getMonthNameAndDate'
+  import convertMsToTime from '../utility/convertMsToTime'
 
   export default {
   components: { LoadingComponent, ErrorComponent },
@@ -11,34 +13,23 @@
 
       onBeforeMount(() => {
         weatherStore.getWeather()
-
       });
 
-      const getMonthNameAndDate = (date: string) => {
-
-        const monthNumber = Number(date.slice(5,7))
-        const dateNumber = date.slice(8)
-      
-        const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-
-        return `${months[monthNumber - 1]} ${dateNumber}`
-
+      const tempFormat = (temp: number) => {
+        if (!weatherStore.tempInCelsius) {
+          return `${Math.round(temp * 1.8 + 32)} °F`;
+        }
+        return `${Math.round(temp)} °C`;
       }
 
-
-      const convertMstoTime = (ms: number) => {
-
-        const sunriseTimestamp = ms; // Unix timestamp for sunrise time
-        const sunriseDate = new Date(sunriseTimestamp * 1000); // Create a new Date object from the timestamp
-        const timezoneOffsetInMinutes = sunriseDate.getTimezoneOffset(); // Get the timezone offset in minutes
-        const timezoneOffsetInMilliseconds = timezoneOffsetInMinutes * 60 * 1000; // Convert the offset to milliseconds
-
-        // Convert the timestamp to your local time by adding the timezone offset
-        const sunriseLocalDate = new Date(sunriseTimestamp * 1000 - timezoneOffsetInMilliseconds).toISOString().slice(11, 19);
-        return sunriseLocalDate;
+      return {
+        weatherStore,
+        convertMsToTime,
+        getMonthNameAndDate,
+        tempFormat,
+        LoadingComponent,
+        ErrorComponent
       }
-
-      return { weatherStore, convertMstoTime, getMonthNameAndDate, LoadingComponent, ErrorComponent }
     }
   }
 </script>
@@ -47,12 +38,22 @@
 
   <LoadingComponent v-if="weatherStore.loading"/>
   <ErrorComponent v-else-if="weatherStore.error" />
+
   <div v-else class="weather-container">
     <div class="weather-today" v-if="weatherStore.weather.data">
       <span class="location">
         {{ weatherStore.weather.city_name }},
         {{ weatherStore.weather.country_code }}
       </span>
+
+      <button
+        @click="weatherStore.toggleTempInCelsius"
+        class="toggle-temp-format-button"
+      >
+        <span v-if="weatherStore.tempInCelsius">°C to °F</span>
+        <span v-else>°F to °C</span>
+      </button>
+
       <div class="row">
         <div class="left-col">
           <img :src="'https://www.weatherbit.io/static/img/icons/' + weatherStore.oneDayWeather.weather.icon + '.png'" :width="170">
@@ -60,12 +61,11 @@
 
         <div class="right-col">
           <span class="date">{{ getMonthNameAndDate(weatherStore.oneDayWeather.datetime) }}</span>
-          <span class="temp">{{ Math.round(weatherStore.oneDayWeather.temp) }} °C</span>
-          <span class="temp temp--small">{{ Math.round(weatherStore.oneDayWeather.min_temp) }} °C ... {{ Math.round(weatherStore.oneDayWeather.max_temp) }} °C</span>
+          <span class="temp">{{ tempFormat(weatherStore.oneDayWeather.temp) }}</span>
+          <span class="temp temp--small">{{ tempFormat(weatherStore.oneDayWeather.min_temp) }} ... {{ tempFormat(weatherStore.oneDayWeather.max_temp) }}</span>
           <span>{{ weatherStore.oneDayWeather.weather.description }}</span>
         </div>
       </div>
-
 
       <div class="row row--box">
 
@@ -101,12 +101,12 @@
         <div class="box">
           <span>
             <span class="box-description">Sunrise:</span>
-            {{ convertMstoTime(weatherStore.oneDayWeather.sunrise_ts) }}
+            {{ convertMsToTime(weatherStore.oneDayWeather.sunrise_ts) }}
           </span>
 
           <span>
             <span class="box-description">Sunset:</span>
-            {{ convertMstoTime(weatherStore.oneDayWeather.sunset_ts) }}
+            {{ convertMsToTime(weatherStore.oneDayWeather.sunset_ts) }}
           </span>
         </div>
 
@@ -121,7 +121,7 @@
         @click="() => weatherStore.setOneDayWeather(day.datetime)"
       >
         <span class="date">{{ getMonthNameAndDate(day.datetime) }}</span>
-        <span class="temp">{{ Math.round(day.temp) }} °C</span>
+        <span class="temp">{{ tempFormat(day.temp) }}</span>
               <img class="icon" :src="'https://www.weatherbit.io/static/img/icons/' + day.weather.icon + '.png'" :width="120">
       </div>
     </div>
@@ -130,11 +130,17 @@
 </template>
 
 <style scoped>
-
+.toggle-temp-format-button {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background-color: rgb(255 255 255 / 52%);
+}
 .box-description {
   color: grey;
 }
 .weather-today {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -234,5 +240,4 @@
     border-top: 2px solid rgb(151, 150, 150);;
   }
 }
-
 </style>

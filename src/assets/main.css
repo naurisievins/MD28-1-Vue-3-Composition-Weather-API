@@ -21,6 +21,18 @@ body {
   font-weight: normal;
 }
 
+button {
+  border-radius: 7px;
+  cursor: pointer;
+  border: none;
+  padding: 0 5px;
+  font-size: 0.9rem;
+}
+
+button:hover{
+  opacity: 0.8;
+}
+
 
 @media only screen and (max-width: 440px) {
   #app {
