@@ -5,4 +5,4 @@
 
 Hosted: https://vue-3-composition-weather-api.netlify.app/
 
-Run npm install and then npm run dev.
+Run `npm install` and then `npm run dev`.
